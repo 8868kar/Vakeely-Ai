@@ -85,6 +85,24 @@ Upon starting the backend, a default administrator is seeded automatically:
 - **Password**: `admin123`
 - **Type**: `User (Admin Role)`
 
+## Deployment Guide
+
+### Backend (via Render)
+1. Push your code to GitHub.
+2. Link your repository to a new **Web Service** on [Render.com](https://render.com).
+3. Set the **Root Directory** to `server`.
+4. Ensure the **Build Command** is `npm install` and **Start Command** is `node server.js`.
+5. Add the necessary Environment Variables (e.g., `PORT=5000`, `OPENAI_API_KEY`, etc.).
+6. Deploy and copy the Render URL (e.g., `https://vakeely-backend.onrender.com`).
+
+### Frontend (via Vercel)
+1. Link your repository to a new Project on [Vercel](https://vercel.com).
+2. Edit the **Root Directory** and set it to `client`.
+3. Add a new Environment Variable:
+   - **Key**: `VITE_API_URL`
+   - **Value**: `https://vakeely-backend.onrender.com/api` *(Make sure to use your actual Render URL and include `/api`!)*
+4. Click Deploy. Vercel will automatically build the site and ensure internal React Router links work seamlessly.
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 

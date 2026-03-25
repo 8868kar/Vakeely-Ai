@@ -2,6 +2,8 @@
 
 VAkeely is an AI-powered Legal Assistance and Lawyer Recommendation Platform designed to democratize legal aid in India. It provides a simple, accessible way for citizens to get basic legal advice, understand their rights, and connect with verified legal professionals.
 
+**Live Demo:** [https://v-akelly.vercel.app/](https://v-akelly.vercel.app/)
+
 ## Features
 
 - **🤖 AI Legal Assistant**: An intelligent chatbot powered by OpenAI that analyzes user queries, classifies cases (Civil, Criminal, Constitutional, etc.), and cites relevant Indian laws (IPC, CrPC, Constitution of India).

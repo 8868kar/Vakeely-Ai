@@ -186,6 +186,31 @@ const legalSeedData = [
       { number: '105', title: 'Lease Defined', description: 'A lease of immoveable property is a transfer of a right to enjoy such property for a certain time.', keywords: ['lease', 'rent', 'tenant', 'landlord', 'tenancy'], penalty: '' },
       { number: '122', title: 'Gift Defined', description: 'Gift is the transfer of certain existing moveable or immoveable property made voluntarily without consideration.', keywords: ['gift', 'donation', 'voluntary transfer'], penalty: '' }
     ]
+  },
+  {
+    title: 'Motor Vehicles Act',
+    shortTitle: 'MVA',
+    category: 'Traffic',
+    year: 1988,
+    description: 'The Motor Vehicles Act regulates all aspects of road transport vehicles, traffic regulations, and motor insurance.',
+    keywords: ['traffic', 'vehicle', 'driving', 'license', 'accident', 'insurance', 'road'],
+    sections: [
+      { number: '3', title: 'Necessity for Driving License', description: 'No person shall drive a motor vehicle in any public place unless he holds an effective driving license.', keywords: ['driving license', 'dl', 'unlicensed driving'], penalty: 'Imprisonment up to 3 months or fine up to Rs 5000' },
+      { number: '112', title: 'Limits of Speed', description: 'No person shall drive a motor vehicle or cause or allow a motor vehicle to be driven in any public place at a speed exceeding the maximum speed or below the minimum speed fixed for the vehicle under this Act.', keywords: ['speeding', 'overspeeding', 'speed limit'], penalty: 'Fine up to Rs 2000' },
+      { number: '185', title: 'Driving by a Drunken Person or under the influence of Drugs', description: 'Whoever, while driving, has in his blood alcohol exceeding 30 mg. per 100 ml.', keywords: ['drunk driving', 'dui', 'intoxicated', 'alcohol'], penalty: 'Imprisonment up to 6 months or fine up to Rs 10000 or both' }
+    ]
+  },
+  {
+    title: 'Juvenile Justice (Care and Protection of Children) Act',
+    shortTitle: 'JJ Act',
+    category: 'Family',
+    year: 2015,
+    description: 'Law relating to children alleged and found to be in conflict with law and children in need of care and protection.',
+    keywords: ['juvenile', 'child', 'care', 'protection', 'adoption', 'conflict with law'],
+    sections: [
+      { number: '15', title: 'Preliminary Assessment into Heinous Offences', description: 'In case of a heinous offence by a child above 16 years, the Board shall conduct a preliminary assessment to try as an adult.', keywords: ['heinous', 'offence', 'sixteen', 'assessment', 'adult trial'], penalty: '' },
+      { number: '74', title: 'Prohibition on Disclosure of Identity', description: 'No media report shall disclose the name, address or school or any other particular of a child in conflict with law or in need of care.', keywords: ['disclosure', 'identity', 'media', 'privacy', 'anonymity'], penalty: 'Imprisonment up to 6 months or fine up to 2 lakhs or both' }
+    ]
   }
 ];
 

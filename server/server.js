@@ -7,6 +7,8 @@ const connectDB = require('./config/db');
 const LegalAct = require('./models/LegalAct');
 const User = require('./models/User');
 const legalSeedData = require('./data/legalSeedData');
+const lawyerSeedData = require('./data/lawyerSeedData');
+const Lawyer = require('./models/Lawyer');
 
 const authRoutes = require('./routes/authRoutes');
 const lawyerRoutes = require('./routes/lawyerRoutes');
@@ -45,6 +47,12 @@ const seedDatabase = async () => {
     if (count === 0) {
       await LegalAct.insertMany(legalSeedData);
       console.log('Legal database seeded with', legalSeedData.length, 'acts');
+    }
+
+    const lawyerCount = await Lawyer.countDocuments();
+    if (lawyerCount === 0) {
+      await Lawyer.create(lawyerSeedData);
+      console.log('Lawyer database seeded with', lawyerSeedData.length, 'lawyers');
     }
 
     // Create default admin user

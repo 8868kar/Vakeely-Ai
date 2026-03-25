@@ -80,9 +80,7 @@ const LoginPage = () => {
             Don&apos;t have an account? <Link to="/register">Create one</Link>
           </div>
 
-          <div style={{ marginTop: 20, padding: '16px', background: 'var(--bg-glass)', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            <strong style={{ color: 'var(--text-secondary)' }}>Demo Admin:</strong> admin@vakeely.com / admin123
-          </div>
+
         </div>
       </div>
     </div>

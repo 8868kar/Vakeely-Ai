@@ -315,11 +315,7 @@ export const generateLegalResponse = async (
     console.log(`[AI] Response generated. Tokens used: ${tokensUsed}. Model: ${activeModel}`);
 
     // Clean up Markdown backticks if the model returned them
-    let cleanedResponseText = responseText;
-    if (cleanedResponseText.startsWith('```json')) cleanedResponseText = cleanedResponseText.replace(/^```json/, '');
-    if (cleanedResponseText.startsWith('```')) cleanedResponseText = cleanedResponseText.replace(/^```/, '');
-    if (cleanedResponseText.endsWith('```')) cleanedResponseText = cleanedResponseText.replace(/```$/, '');
-    cleanedResponseText = cleanedResponseText.trim();
+    let cleanedResponseText = responseText.replace(/^```[a-z]*\s*/i, '').replace(/\s*```\s*$/i, '').trim();
 
     // Step 5: Parse and validate JSON response
     try {

@@ -2,6 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.js';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiShield } from 'react-icons/fi';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -10,7 +11,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -29,6 +30,26 @@ const LoginPage: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setError('');
+    setLoading(true);
+    try {
+      if (!credentialResponse.credential) throw new Error("Google credential missing");
+      const data = await googleLogin(credentialResponse.credential, accountType);
+      if (data.accountType === 'lawyer') {
+        navigate('/lawyer-dashboard');
+      } else if (data.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/chat');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -83,6 +104,22 @@ const LoginPage: React.FC = () => {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
+
+          <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            <span style={{ padding: '0 10px' }}>or continue with</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Authentication could not be completed.')}
+              theme="outline"
+              size="large"
+              shape="pill"
+            />
+          </div>
 
           <div className="auth-footer">
             Don&apos;t have an account? <Link to="/register">Create one</Link>

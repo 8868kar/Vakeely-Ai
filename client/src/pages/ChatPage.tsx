@@ -172,46 +172,87 @@ const ChatPage: React.FC = () => {
         </div>
 
         {parsed.summary && (
-          <>
-            <h4><FiFileText size={15} style={{ marginRight: 8, verticalAlign: 'middle' }} />Case Summary</h4>
-            <p>{parsed.summary}</p>
-          </>
+          <div style={{ background: 'rgba(59, 130, 246, 0.04)', border: '1px solid rgba(59, 130, 246, 0.1)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--primary)', marginBottom: 8, fontSize: '1rem', fontWeight: 600 }}><FiFileText />Case Summary</h4>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>{parsed.summary}</p>
+          </div>
         )}
 
         {parsed.explanation && (
-          <>
-            <h4><FiInfo size={15} style={{ marginRight: 8, verticalAlign: 'middle' }} />Legal Analysis</h4>
-            <p>{parsed.explanation}</p>
-          </>
+          <div style={{ background: 'rgba(139, 92, 246, 0.04)', border: '1px solid rgba(139, 92, 246, 0.1)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent)', marginBottom: 8, fontSize: '1rem', fontWeight: 600 }}><FiInfo />Legal Analysis</h4>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>{parsed.explanation}</p>
+          </div>
         )}
 
         {parsed.relevantLaws && parsed.relevantLaws.length > 0 && (
-          <>
-            <h4><FiBook size={15} style={{ marginRight: 8, verticalAlign: 'middle' }} />Relevant Laws</h4>
-            {parsed.relevantLaws.map((law, i) => (
-              <div key={i} className="law-reference">
-                <div>
-                  <div className="law-act">{law.act}</div>
-                  {law.section && <div className="law-section">§ {law.section}</div>}
-                  <div className="law-desc">{law.description}</div>
+          <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-primary)', marginBottom: 12, fontSize: '1rem', fontWeight: 600 }}><FiBook style={{ color: 'var(--primary)' }} />Relevant Laws</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {parsed.relevantLaws.map((law, i) => (
+                <div key={i} className="law-reference" style={{ background: 'var(--bg-secondary)', padding: '12px 16px', borderRadius: 8, borderLeft: '3px solid var(--primary)' }}>
+                  <div>
+                    <div className="law-act" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{law.act}</div>
+                    {law.section && <div className="law-section" style={{ fontSize: '0.85rem', color: 'var(--primary)', marginBottom: 4 }}>§ {law.section}</div>}
+                    <div className="law-desc" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{law.description}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {parsed.precedents && parsed.precedents.length > 0 && (
+          <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-primary)', marginBottom: 12, fontSize: '1rem', fontWeight: 600 }}><FiLayers style={{ color: '#6366f1' }} />Supreme Court Precedents</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {parsed.precedents.map((prec: any, i: number) => (
+                <div key={i} className="law-reference" style={{ background: 'rgba(99,102,241,0.06)', borderLeft: '3px solid #6366f1', padding: '12px 16px', borderRadius: 8 }}>
+                  <div>
+                    <div className="law-act" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{prec.title}</div>
+                    <div className="law-section" style={{ fontSize: '0.85rem', color: '#6366f1', marginBottom: 4 }}>{prec.date !== 'N/A' ? new Date(prec.date).toLocaleDateString() : 'Date N/A'} • {prec.bench}</div>
+                    {prec.summary && <div className="law-desc" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{prec.summary}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {parsed.recommendations && (
-          <>
-            <h4><FiCheckCircle size={15} style={{ marginRight: 8, verticalAlign: 'middle' }} />Recommended Actions</h4>
-            <p style={{ whiteSpace: 'pre-line' }}>{parsed.recommendations}</p>
-          </>
+          <div style={{ background: 'rgba(16, 185, 129, 0.04)', border: '1px solid rgba(16, 185, 129, 0.1)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#10b981', marginBottom: 8, fontSize: '1rem', fontWeight: 600 }}><FiCheckCircle />Recommended Actions</h4>
+            <p style={{ whiteSpace: 'pre-line', color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>{parsed.recommendations}</p>
+          </div>
         )}
 
         {parsed.lawyerType && (
-          <>
-            <h4><FiUser size={15} style={{ marginRight: 8, verticalAlign: 'middle' }} />Lawyer Type Required</h4>
-            <p>{parsed.lawyerType}</p>
-          </>
+          <div style={{ background: 'rgba(0, 0, 0, 0.02)', border: '1px dashed var(--border)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-primary)', marginBottom: 8, fontSize: '1rem', fontWeight: 600 }}><FiUser style={{ color: 'var(--primary)' }} />Lawyer Type Required</h4>
+            <p style={{ color: 'var(--primary)', fontWeight: 600 }}>{parsed.lawyerType}</p>
+          </div>
+        )}
+
+        {parsed.matchedLawyers && parsed.matchedLawyers.length > 0 && (
+          <div style={{ marginTop: 14 }}>
+            <h4><FiUser size={15} style={{ marginRight: 8, verticalAlign: 'middle' }} />Recommended Lawyers</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+              {parsed.matchedLawyers.map((lawyer: any, i: number) => (
+                <div key={i} style={{ padding: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                  <div style={{ fontWeight: 600, fontSize: '1.05rem', color: 'var(--text-primary)', marginBottom: 4 }}>
+                    {lawyer.name}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 4 }}>
+                    {lawyer.specializations && lawyer.specializations.join(', ')} • {lawyer.experience} yrs exp.
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                    <span>📍 {lawyer.location}</span>
+                    <span style={{ fontWeight: 600, color: 'var(--primary)' }}>₹{lawyer.consultationFee}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Law DB Sources — shown only when RAG found results */}

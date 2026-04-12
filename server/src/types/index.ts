@@ -108,6 +108,8 @@ export interface IAIResponse {
   complexity: string;
   estimatedTimeline: string;
   legalDBSources: string[];
+  matchedLawyers?: any[];
+  precedents?: { title: string; date: string; bench: string; summary?: string }[];
 }
 
 export interface IAppointment extends Document {

@@ -1,6 +1,9 @@
 import express, { Request, Response, Router } from 'express';
 import ChatHistory from '../models/ChatHistory.js';
 import LegalAct from '../models/LegalAct.js';
+import Case from '../models/Case.js';
+import Appointment from '../models/Appointment.js';
+import Lawyer from '../models/Lawyer.js';
 import { auth } from '../middleware/auth.js';
 import { chatRateLimiter } from '../middleware/rateLimiter.js';
 import { validateChatInput, MAX_MESSAGE_LENGTH } from '../middleware/inputValidator.js';
@@ -45,8 +48,12 @@ router.post('/', auth, chatRateLimiter, validateChatInput, async (req: Request, 
     // Add user message to history
     chat.messages.push({ role: 'user', content: message, timestamp: new Date() });
 
+    // Fetch user appointments
+    const userAppointments = await Appointment.find({ userId: req.userId })
+      .sort({ createdAt: -1 }).limit(3).select('caseType description date');
+
     // Generate RAG response — pass LegalAct model for DB retrieval
-    const aiResponse = await generateLegalResponse(message, chat.messages as IChatMessage[], LegalAct);
+    const aiResponse = await generateLegalResponse(message, chat.messages as IChatMessage[], LegalAct, Case, userAppointments);
 
     // Serialize the response content to store in DB
     const assistantContent = aiResponse.data
@@ -68,10 +75,28 @@ router.post('/', auth, chatRateLimiter, validateChatInput, async (req: Request, 
 
     await chat.save();
 
+    // Fetch matching lawyers based on AI response
+    let matchingLawyers = [];
+    if (aiResponse.data) {
+      if (aiResponse.data.lawyerType && typeof aiResponse.data.lawyerType === 'string') {
+        const typeBase = aiResponse.data.lawyerType.split('-')[0].trim();
+        matchingLawyers = await Lawyer.find({
+          specializations: { $regex: new RegExp(typeBase, 'i') }
+        }).limit(3).select('name specializations experience location consultationFee');
+      }
+      
+      if (matchingLawyers.length === 0 && aiResponse.data.caseType) {
+        const typeBase = aiResponse.data.caseType.split('-')[0].trim();
+        matchingLawyers = await Lawyer.find({
+          specializations: { $regex: new RegExp(typeBase, 'i') }
+        }).limit(3).select('name specializations experience location consultationFee');
+      }
+    }
+
     // Return structured response to frontend
     res.json({
       chatId: chat._id,
-      response: aiResponse.data || { explanation: aiResponse.raw },
+      response: { ...(aiResponse.data || { explanation: aiResponse.raw }), matchedLawyers: matchingLawyers },
       raw: assistantContent,
       isFallback: aiResponse.isFallback || false,
       isRAG: aiResponse.isRAG || false,

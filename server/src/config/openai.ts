@@ -19,21 +19,32 @@ import { ILegalAct, IAIStatus, IAIResult, IAIResponse, IChatMessage } from '../t
 // ─── CLIENT SETUP ────────────────────────────────────────────────────────────
 
 let openaiClient: OpenAI | null = null;
+let activeModel = 'gpt-4o-mini';
+let isGeminiMode = false;
+let geminiApiKeyStr = '';
 
 export const getOpenAIClient = (): OpenAI | null => {
   if (!openaiClient) {
-    const key = process.env.OPENAI_API_KEY;
+    const key = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
     if (!key || key === 'your_openai_api_key_here') {
       return null;
     }
+    
+    isGeminiMode = key.startsWith('AIza') || !!process.env.GEMINI_API_KEY;
+    if (isGeminiMode) {
+      activeModel = 'gemini-2.5-flash';
+      geminiApiKeyStr = key;
+      // Return a dummy client so ai status shows available
+      return {} as any;
+    }
+
     openaiClient = new OpenAI({ apiKey: key });
   }
   return openaiClient;
 };
 
-// Model config — gpt-4o-mini: best quality-to-cost ratio for legal reasoning
-const MODEL = 'gpt-4o-mini';
-const MAX_TOKENS = 2000;
+// Model config Defaults
+const MAX_TOKENS = 4000;
 const TEMPERATURE = 0.2; // Low temp = more precise, less hallucination
 
 // ─── RAG: RETRIEVE LEGAL CONTEXT FROM MONGODB ────────────────────────────────
@@ -42,7 +53,7 @@ const TEMPERATURE = 0.2; // Low temp = more precise, less hallucination
  * Retrieves the most relevant Indian law acts and sections from MongoDB
  * based on the user's query using full-text search + keyword matching.
  */
-const retrieveLegalContext = async (userMessage: string, LegalActModel: Model<ILegalAct> | null): Promise<string> => {
+const retrieveLegalContext = async (userMessage: string, LegalActModel: Model<ILegalAct> | null, CaseModel: Model<any> | null): Promise<string> => {
   if (!LegalActModel) return '';
 
   try {
@@ -118,6 +129,28 @@ const retrieveLegalContext = async (userMessage: string, LegalActModel: Model<IL
       contextLines.push('');
     }
 
+    // Strategy 3: Retrieve Supreme Court judgments
+    if (CaseModel) {
+      try {
+        const cases = await CaseModel.find(
+          { $text: { $search: userMessage } },
+          { score: { $meta: 'textScore' } }
+        ).sort({ score: { $meta: 'textScore' } as any }).limit(3).lean();
+        
+        if (cases.length > 0) {
+          contextLines.push('=== SUPREME COURT PRECEDENTS ===');
+          for (const c of cases) {
+            contextLines.push(`Case: ${c.title}`);
+            contextLines.push(`Date: ${c.date ? new Date(c.date).toISOString().split('T')[0] : 'N/A'}`);
+            contextLines.push(`Bench: ${c.bench || 'N/A'}`);
+          }
+          contextLines.push('=============================\n');
+        }
+      } catch (err) {
+        // text index might not be ready
+      }
+    }
+
     contextLines.push('=== END OF LAW DATABASE CONTEXT ===\n');
     return contextLines.join('\n');
 
@@ -129,18 +162,21 @@ const retrieveLegalContext = async (userMessage: string, LegalActModel: Model<IL
 
 // ─── SYSTEM PROMPT BUILDER ────────────────────────────────────────────────────
 
-const buildSystemPrompt = (legalContext: string): string => {
+const buildSystemPrompt = (legalContext: string, userContext: string = ''): string => {
   const contextSection = legalContext
     ? `\n${legalContext}\nIMPORTANT: You MUST cite sections from the above database context in your relevantLaws array. These are verified, accurate Indian laws from VAkeely's database — prefer them over generic knowledge.\n`
     : '';
 
   return `You are VAkeely AI, an expert Indian legal assistant operating with the authority and precision of a senior trial lawyer. You have access to VAkeely's verified Indian law database.
 ${contextSection}
+${userContext}
+CRITICAL LANGUAGE INSTRUCTION: You must strictly understand and fluently respond in the exact language the user used (English, pure Hindi, or Hinglish - Hindi written in English alphabet). All content values in the JSON (summary, explanation, recommendations, expected timeline) MUST be translated to the user's language. The JSON keys and lawyerType must remain in English.
+
 Your role is to:
-1. Understand and classify the user's legal situation into specific Indian law categories.
+1. Understand the user's legal situation in English, Hindi, or Hinglish.
 2. Draft a precise professional Case Summary detailing core facts, legal issues, and evidence required.
-3. Identify exact Indian laws, acts, and sections — PRIORITIZE sections from the VAKEELY LAW DATABASE CONTEXT above.
-4. Provide a strategic legal analysis: rights, liabilities, burden of proof, judicial precedents.
+3. Identify exact Indian laws, acts, and sections — PRIORITIZE sections from the VAKEELY LAW DATABASE CONTEXT.
+4. Provide a strategic legal analysis: rights, liabilities, burden of proof, key precedents.
 5. Give concrete, actionable legal recommendations.
 6. Estimate case complexity and timeline in the Indian judiciary.
 
@@ -156,10 +192,14 @@ STRICT OUTPUT FORMAT — respond ONLY with valid JSON, no markdown, no extra tex
   "lawyerType": "Specific type of lawyer required",
   "complexity": "Low/Medium/High — with brief justification",
   "estimatedTimeline": "Realistic timeline in Indian courts",
-  "legalDBSources": ["Act Short Title §Section", "..."]
+  "legalDBSources": ["Act Short Title §Section", "..."],
+  "precedents": [
+    { "title": "Case Title", "date": "YYYY-MM-DD", "bench": "Judge Name", "summary": "Why it matters" }
+  ]
 }
 
-The legalDBSources field must list the section references you cited from the database context (e.g., ["IPC §302", "CrPC §154"]).
+The legalDBSources field must list the section references you cited from the database context (e.g., ["IPC §302", "CrPC §154"]). 
+The precedents array MUST list the Supreme Court Precedents precisely as provided in the VAKEELY LAW DATABASE CONTEXT.
 Be authoritative and professional. Always note this is AI guidance, not a substitute for retained legal counsel.`;
 };
 
@@ -171,7 +211,9 @@ Be authoritative and professional. Always note this is AI guidance, not a substi
 export const generateLegalResponse = async (
   userMessage: string, 
   chatHistory: IChatMessage[] = [], 
-  LegalActModel: Model<ILegalAct> | null = null
+  LegalActModel: Model<ILegalAct> | null = null,
+  CaseModel: Model<any> | null = null,
+  userAppointments: any[] = []
 ): Promise<IAIResult> => {
   const client = getOpenAIClient();
 
@@ -181,15 +223,25 @@ export const generateLegalResponse = async (
   }
 
   // Step 1: Retrieve relevant law context from MongoDB
-  const legalContext = await retrieveLegalContext(userMessage, LegalActModel);
+  const legalContext = await retrieveLegalContext(userMessage, LegalActModel, CaseModel);
   if (legalContext) {
     console.log('[RAG] Retrieved law context for query — grounded response enabled.');
   } else {
     console.log('[RAG] No DB context found — using general knowledge.');
   }
 
+  // Step 1.5: Build user context
+  let userContextStr = '';
+  if (userAppointments && userAppointments.length > 0) {
+    userContextStr = '=== USER HISTORY ===\nPast appointments/case history recorded:\n';
+    userAppointments.forEach((app, i) => {
+      userContextStr += `${i+1}. Case Type: ${app.caseType || 'N/A'}, Description: ${app.description || 'N/A'}\n`;
+    });
+    userContextStr += 'Consider this context if the user refers to past situations.\n====================\n';
+  }
+
   // Step 2: Build grounded system prompt
-  const systemPrompt = buildSystemPrompt(legalContext);
+  const systemPrompt = buildSystemPrompt(legalContext, userContextStr);
 
   // Step 3: Prepare message history (keep last 6 messages for context window efficiency)
   const recentHistory = chatHistory.slice(-6).map(msg => ({
@@ -205,23 +257,73 @@ export const generateLegalResponse = async (
     { role: 'user', content: userMessage }
   ];
 
-  // Step 4: Call OpenAI with retry logic
+  // Step 4: Call AI with retry logic
   try {
-    const completion = await client.chat.completions.create({
-      model: MODEL,
-      messages,
-      temperature: TEMPERATURE,
-      max_tokens: MAX_TOKENS,
-      response_format: { type: 'json_object' } // Enforces JSON output — no markdown wrapping
-    });
+    let responseText = '{}';
+    let tokensUsed = 0;
 
-    const responseText = completion.choices[0].message.content || '{}';
-    const tokensUsed = completion.usage?.total_tokens || 0;
-    console.log(`[AI] Response generated. Tokens used: ${tokensUsed}. Model: ${MODEL}`);
+    if (isGeminiMode) {
+      // Execute native Gemini Request
+      const contents = [];
+      contents.push({ role: "user", parts: [{ text: systemPrompt }] });
+      contents.push({ role: "model", parts: [{ text: "Understood. I will strictly follow this context." }] });
+      
+      messages.forEach(msg => {
+        if (msg.role === 'system') return;
+        contents.push({
+          role: msg.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: String(msg.content) }]
+        });
+      });
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${geminiApiKeyStr}`;
+      
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            temperature: TEMPERATURE,
+            maxOutputTokens: MAX_TOKENS,
+            responseMimeType: "application/json"
+          }
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`Gemini Error: ${await res.text()}`);
+      }
+      
+      const resData = await res.json();
+      responseText = resData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+      tokensUsed = resData.usageMetadata?.totalTokenCount || 0;
+    } else {
+      // Execute standard OpenAI Request
+      const completion = await client.chat.completions.create({
+        model: activeModel,
+        messages,
+        temperature: TEMPERATURE,
+        max_tokens: 4000,
+        response_format: { type: 'json_object' }
+      });
+
+      responseText = completion.choices[0].message.content || '{}';
+      tokensUsed = completion.usage?.total_tokens || 0;
+    }
+
+    console.log(`[AI] Response generated. Tokens used: ${tokensUsed}. Model: ${activeModel}`);
+
+    // Clean up Markdown backticks if the model returned them
+    let cleanedResponseText = responseText;
+    if (cleanedResponseText.startsWith('```json')) cleanedResponseText = cleanedResponseText.replace(/^```json/, '');
+    if (cleanedResponseText.startsWith('```')) cleanedResponseText = cleanedResponseText.replace(/^```/, '');
+    if (cleanedResponseText.endsWith('```')) cleanedResponseText = cleanedResponseText.replace(/```$/, '');
+    cleanedResponseText = cleanedResponseText.trim();
 
     // Step 5: Parse and validate JSON response
     try {
-      const parsed = JSON.parse(responseText) as IAIResponse;
+      const parsed = JSON.parse(cleanedResponseText) as IAIResponse;
 
       // Ensure required fields exist
       if (!parsed.caseType) parsed.caseType = 'General Legal Query';
@@ -232,7 +334,7 @@ export const generateLegalResponse = async (
         success: true,
         data: parsed,
         raw: responseText,
-        model: MODEL,
+        model: activeModel,
         tokensUsed,
         isRAG: !!legalContext
       };
@@ -253,7 +355,7 @@ export const generateLegalResponse = async (
         success: true,
         data: fallbackData,
         raw: responseText,
-        model: MODEL,
+        model: activeModel,
         tokensUsed,
         isRAG: !!legalContext
       };
@@ -377,8 +479,8 @@ export const getAIStatus = (): IAIStatus => {
   const client = getOpenAIClient();
   return {
     available: !!client,
-    model: client ? MODEL : null,
-    mode: client ? 'rag-gpt4o-mini' : 'keyword-fallback',
+    model: client ? activeModel : null,
+    mode: client ? ('rag-' + activeModel) as 'rag-gpt4o-mini' : 'keyword-fallback',
     features: {
       rag: true,
       lawDatabase: true,

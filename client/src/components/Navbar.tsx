@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.js';
-import { FiMenu, FiX, FiLogOut, FiMessageSquare, FiSearch, FiCalendar, FiGrid, FiShield } from 'react-icons/fi';
+import { FiMenu, FiX, FiLogOut, FiMessageSquare, FiSearch, FiCalendar, FiGrid, FiShield, FiFileText } from 'react-icons/fi';
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, isAdmin, isLawyer, logout } = useAuth();
@@ -40,6 +40,9 @@ const Navbar: React.FC = () => {
             <>
               <Link to="/chat" className={isActive('/chat')} onClick={() => setMobileOpen(false)}>
                 <FiMessageSquare style={{ marginRight: 6 }} />AI Assistant
+              </Link>
+              <Link to="/analyzer" className={isActive('/analyzer')} onClick={() => setMobileOpen(false)}>
+                <FiFileText style={{ marginRight: 6 }} />Analyzer
               </Link>
               <Link to="/lawyers" className={isActive('/lawyers')} onClick={() => setMobileOpen(false)}>
                 <FiSearch style={{ marginRight: 6 }} />Find Lawyers

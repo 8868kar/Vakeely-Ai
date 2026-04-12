@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.js';
 import { FiUser, FiMail, FiLock, FiPhone, FiEye, FiEyeOff, FiMapPin, FiBriefcase, FiShield } from 'react-icons/fi';
+import { GoogleLogin } from '@react-oauth/google';
 
 const SPECIALIZATIONS = ['Civil', 'Criminal', 'Corporate', 'IP', 'Tax', 'Family', 'Property', 'Labour', 'Constitutional', 'Consumer', 'General'];
 
@@ -30,7 +31,7 @@ const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const { register } = useAuth();
+  const { register, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -61,6 +62,26 @@ const RegisterPage: React.FC = () => {
       navigate(accountType === 'lawyer' ? '/lawyer-dashboard' : '/chat');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setError('');
+    setLoading(true);
+    try {
+      if (!credentialResponse.credential) throw new Error("Google credential missing");
+      const data = await googleLogin(credentialResponse.credential, accountType);
+      if (data.accountType === 'lawyer') {
+        navigate('/lawyer-dashboard');
+      } else if (data.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/chat');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -183,6 +204,22 @@ const RegisterPage: React.FC = () => {
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
+
+          <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            <span style={{ padding: '0 10px' }}>or signup with</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Authentication could not be completed.')}
+              theme="outline"
+              size="large"
+              shape="pill"
+            />
+          </div>
 
           <div className="auth-footer">
             Already have an account? <Link to="/login">Sign In</Link>

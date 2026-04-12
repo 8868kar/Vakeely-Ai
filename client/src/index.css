@@ -5,16 +5,16 @@
    ============================================ */
 
 :root {
-  /* Primary Palette */
-  --primary: #6366f1;
-  --primary-light: #818cf8;
-  --primary-dark: #4f46e5;
-  --primary-glow: rgba(99, 102, 241, 0.3);
+  /* Primary Palette (Professional Blue) */
+  --primary: #2563eb;
+  --primary-light: #60a5fa;
+  --primary-dark: #1d4ed8;
+  --primary-glow: rgba(37, 99, 235, 0.25);
 
   /* Accent */
-  --accent: #f59e0b;
-  --accent-light: #fbbf24;
-  --accent-dark: #d97706;
+  --accent: #8b5cf6;
+  --accent-light: #c4b5fd;
+  --accent-dark: #6d28d9;
 
   /* Success / Error / Warning */
   --success: #10b981;
@@ -24,48 +24,48 @@
   --warning: #f59e0b;
   --info: #3b82f6;
 
-  /* Background - Dark Theme */
-  --bg-primary: #0a0a1a;
-  --bg-secondary: #111128;
-  --bg-tertiary: #1a1a3e;
-  --bg-card: rgba(26, 26, 62, 0.6);
-  --bg-card-hover: rgba(36, 36, 82, 0.8);
-  --bg-glass: rgba(255, 255, 255, 0.04);
-  --bg-glass-light: rgba(255, 255, 255, 0.08);
-  --bg-input: rgba(255, 255, 255, 0.06);
+  /* Background - Professional Clean Theme */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-hover: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-light: rgba(255, 255, 255, 0.95);
+  --bg-input: #ffffff;
 
   /* Text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-accent: #818cf8;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-accent: #2563eb;
 
   /* Borders */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-light: rgba(255, 255, 255, 0.12);
-  --border-active: rgba(99, 102, 241, 0.5);
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+  --border-active: #93c5fd;
 
-  /* Shadows */
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.2);
-  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  /* Shadows - Crisp and Professional */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
 
-  /* Radii */
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  /* Radii (More Rounded for Stitch) */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --radius-xl: 32px;
   --radius-full: 9999px;
 
   /* Font */
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Google Sans', system-ui, sans-serif;
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Transitions - Elastic & Premium */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 500ms cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Sizing */
   --navbar-height: 72px;
@@ -149,9 +149,9 @@ input, textarea, select, button {
    ============================================ */
 .glass-card {
   background: var(--bg-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-light);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
   box-shadow: var(--shadow-card);
@@ -159,9 +159,9 @@ input, textarea, select, button {
 
 .glass-card:hover {
   background: var(--bg-card-hover);
-  border-color: var(--primary-light);
-  box-shadow: var(--shadow-glow), var(--shadow-lg);
-  transform: translateY(-5px);
+  border-color: var(--border-active);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.08), var(--shadow-glow);
+  transform: translateY(-2px);
 }
 
 /* ============================================
@@ -174,7 +174,7 @@ input, textarea, select, button {
   gap: 8px;
   padding: 12px 24px;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -184,26 +184,29 @@ input, textarea, select, button {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: white;
-  box-shadow: 0 4px 15px var(--primary-glow);
+  background: linear-gradient(180deg, var(--primary-light), var(--primary));
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.2);
+  border: 1px solid var(--primary-dark);
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  box-shadow: 0 6px 25px var(--primary-glow);
-  transform: translateY(-2px);
-  color: white;
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 4px 15px var(--primary-glow);
+  transform: translateY(-1px);
+  color: #fff;
 }
 
 .btn-secondary {
-  background: var(--bg-glass-light);
+  background: #ffffff;
   color: var(--text-primary);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 }
 .btn-secondary:hover {
-  background: var(--bg-glass);
-  border-color: var(--primary);
-  color: var(--primary-light);
+  background: var(--bg-tertiary);
+  border-color: var(--text-muted);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  color: var(--text-primary);
 }
 
 .btn-accent {
@@ -253,7 +256,7 @@ input, textarea, select, button {
   padding: 12px 16px;
   background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   color: var(--text-primary);
   font-size: 0.95rem;
   transition: all var(--transition-fast);
@@ -262,8 +265,8 @@ input, textarea, select, button {
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  background: rgba(99, 102, 241, 0.05);
-  box-shadow: 0 0 0 3px var(--primary-glow);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 .form-input::placeholder { color: var(--text-muted); }
@@ -322,9 +325,9 @@ input, textarea, select, button {
   left: 0;
   right: 0;
   height: var(--navbar-height);
-  background: rgba(10, 10, 26, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(250, 248, 245, 0.85);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   border-bottom: 1px solid var(--border);
   z-index: 1000;
   display: flex;
@@ -437,8 +440,8 @@ input, textarea, select, button {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 70% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+  background: radial-gradient(circle at 30% 50%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 70% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
   animation: bgFloat 20s ease-in-out infinite;
 }
 
@@ -614,8 +617,8 @@ input, textarea, select, button {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
 }
 
 .auth-container {

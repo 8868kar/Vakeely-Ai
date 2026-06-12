@@ -5,45 +5,45 @@
    ============================================ */
 
 :root {
-  /* Primary Palette (Professional Blue) */
-  --primary: #2563eb;
-  --primary-light: #60a5fa;
-  --primary-dark: #1d4ed8;
-  --primary-glow: rgba(37, 99, 235, 0.25);
+  /* Primary Palette (Lavender / Periwinkle theme) */
+  --primary: #8B5CF6;
+  --primary-light: #A78BFA;
+  --primary-dark: #7C3AED;
+  --primary-glow: rgba(139, 92, 246, 0.2);
 
   /* Accent */
-  --accent: #8b5cf6;
-  --accent-light: #c4b5fd;
-  --accent-dark: #6d28d9;
+  --accent: #6366F1;
+  --accent-light: #818CF8;
+  --accent-dark: #4F46E5;
 
   /* Success / Error / Warning */
-  --success: #10b981;
-  --success-light: #34d399;
-  --error: #ef4444;
-  --error-light: #f87171;
-  --warning: #f59e0b;
-  --info: #3b82f6;
+  --success: #10B981;
+  --success-light: #34D399;
+  --error: #EF4444;
+  --error-light: #F87171;
+  --warning: #F59E0B;
+  --info: #3B82F6;
 
-  /* Background - Professional Clean Theme */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --bg-card-hover: #ffffff;
-  --bg-glass: rgba(255, 255, 255, 0.85);
-  --bg-glass-light: rgba(255, 255, 255, 0.95);
-  --bg-input: #ffffff;
+  /* Background - Modern SaaS Light Theme */
+  --bg-primary: #F9FAFB;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F3F4F6;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-light: rgba(255, 255, 255, 0.9);
+  --bg-input: #FFFFFF;
 
-  /* Text */
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-accent: #2563eb;
+  /* Text - High Legibility */
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6B7280;
+  --text-accent: #8B5CF6;
 
-  /* Borders */
-  --border: #e2e8f0;
-  --border-light: #f1f5f9;
-  --border-active: #93c5fd;
+  /* Borders - Ultra-light grey */
+  --border: #E5E7EB;
+  --border-light: #F3F4F6;
+  --border-active: #D1D5DB;
 
   /* Shadows - Crisp and Professional */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -184,16 +184,16 @@ input, textarea, select, button {
 }
 
 .btn-primary {
-  background: linear-gradient(180deg, var(--primary-light), var(--primary));
-  color: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.2);
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   border: 1px solid var(--primary-dark);
 }
 .btn-primary:hover {
-  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  background: var(--primary-dark);
   box-shadow: 0 4px 15px var(--primary-glow);
   transform: translateY(-1px);
-  color: #fff;
+  color: #ffffff;
 }
 
 .btn-secondary {
@@ -204,7 +204,7 @@ input, textarea, select, button {
 }
 .btn-secondary:hover {
   background: var(--bg-tertiary);
-  border-color: var(--text-muted);
+  border-color: var(--text-secondary);
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   color: var(--text-primary);
 }
@@ -325,7 +325,7 @@ input, textarea, select, button {
   left: 0;
   right: 0;
   height: var(--navbar-height);
-  background: rgba(250, 248, 245, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border-bottom: 1px solid var(--border);
@@ -480,10 +480,8 @@ input, textarea, select, button {
 }
 
 .hero-title .gradient-text {
-  background: linear-gradient(135deg, var(--primary-light), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
+  font-weight: 800;
 }
 
 .hero-subtitle {
@@ -546,7 +544,7 @@ input, textarea, select, button {
 .feature-icon {
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
@@ -584,11 +582,7 @@ input, textarea, select, button {
 
 .stat-number {
   font-size: 2.5rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--primary-light), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
 }
 
 .stat-label {
@@ -617,8 +611,8 @@ input, textarea, select, button {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
 }
 
 .auth-container {
